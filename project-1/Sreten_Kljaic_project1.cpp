@@ -61,7 +61,7 @@ void bubble_sort(vector<T> &list, bool descending) {
     bool swap = true;
     while (swap) {
         swap = false;
-        for (int i = 0; i < list.size()-1; i++) {
+        for (size_t i = 0; i < list.size()-1; i++) {
             if (descending ? list[i] < list[i+1] : list[i] > [i+1]) {
                 T temp = list[i];
                 list[i] = list[i+1];
@@ -104,7 +104,22 @@ void bubble_sort(vector<T> &list, bool descending) {
 template<typename T>
 void selection_sort(vector<T> &list, bool descending) {
 
-    for (int i = 0; i < list.size()-1
+    for (size_t i = 0; i < list.size()-1; i++) {
+        size_t index = i;
+
+        for (size_t j = i+1; i < list.size(); j++) {
+            if (desired ? list[j] > list[index] : list[j] < list[index]) {
+                index = j;
+            }
+        }
+
+        if (index != i) {
+            T temp = list[i];
+            list[i] = list[i+1];
+            list[i+1] = temp;
+        }
+
+    }
 
 
     // Your code here!
