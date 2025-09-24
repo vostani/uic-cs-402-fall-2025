@@ -120,20 +120,7 @@ void selection_sort(vector<T> &list, bool descending) {
         }
 
     }
-
-
-    // Your code here!
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -157,7 +144,16 @@ void selection_sort(vector<T> &list, bool descending) {
  * */
 template<typename T>
 void insertion_sort(vector<T> &list, bool descending) {
-    // Your code here!
+    for (size_t i = 1; i < list.size(); i++) {
+        T current = list[i];
+
+        size_t j = i-1;
+        while(j >= 0 && (descending ? list[j] < current : list[j] > current)) {
+            list[j+1] = list[j];
+            j--;
+        }
+        list[j+1] = current;
+    }
 }
 
 
@@ -202,7 +198,7 @@ void quicksort(vector<T> &list, bool descending) {
  * quicksort algorithm above.
  *
  */
-template<typename T>
+template<typename T> 
 vector<T>& quick_partition(vector<T> &list, bool descending) {
     // Your code here!
     //
