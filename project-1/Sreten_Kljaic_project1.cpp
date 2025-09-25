@@ -57,11 +57,13 @@ using namespace std;
  * */
 template<typename T>
 void bubble_sort(vector<T> &list, bool descending) {
+    int size = list.size();
+    if (size < 2) return;
 
     bool swapping = true;
     while (swapping) {
         swap = false;
-        for (size_t i = 0; i < list.size()-1; i++) {
+        for (int i = 0; i < size-1; i++) {
             if (descending ? list[i] < list[i+1] : list[i] > [i+1]) {
                 swap(list[i], list[i+1]);
 
@@ -101,11 +103,13 @@ void bubble_sort(vector<T> &list, bool descending) {
  * */
 template<typename T>
 void selection_sort(vector<T> &list, bool descending) {
+    int size = list.size();
+    if (size < 2) return;
 
-    for (size_t i = 0; i < list.size()-1; i++) {
-        size_t index = i;
+    for (int i = 0; i < size-1; i++) {
+        int index = i;
 
-        for (size_t j = i+1; i < list.size(); j++) {
+        for (int j = i+1; i < size; j++) {
             if (descending ? list[j] > list[index] : list[j] < list[index]) {
                 index = j;
             }
@@ -139,10 +143,13 @@ void selection_sort(vector<T> &list, bool descending) {
  * */
 template<typename T>
 void insertion_sort(vector<T> &list, bool descending) {
-    for (size_t i = 1; i < list.size(); i++) {
+    int size = list.size();
+    if (size < 2) return;
+
+    for (int i = 1; i < size; i++) {
         T current = list[i];
 
-        size_t j = i-1;
+        int j = i-1;
         while(j >= 0 && (descending ? list[j] < current : list[j] > current)) {
             list[j+1] = list[j];
             j--;
@@ -229,16 +236,16 @@ vector<T>& quick_partition(vector<T> &list, bool descending) {
  * */
 template<typename T>
 void merge_sort(vector<T> &list, bool decending) {
-    size_t size = list.size();
+    int size = list.size();
     if (size < 2) return;
 
-    size_t middle = size / 2;   
+    int middle = size / 2;   
     vector<T> left(list.begin(),list.begin() + middle);
     vector<T> right(list.begin() + middle,list.end());
     merge_sort(left);
     merge_sort(right);
 
-    size_t i = 0; j = 0; k = 0;
+    int i = 0; j = 0; k = 0;
 
     while(i < left.size() && j < right.size()) {
         if (decending ? left[i] > right[j] : left[i] < right[j]) {
@@ -261,7 +268,6 @@ void merge_sort(vector<T> &list, bool decending) {
         list[k] = right[j];
         j++;
         k++;
-
     }
 }
 
@@ -297,9 +303,45 @@ void merge_sort(vector<T> &list, bool decending) {
  */
 template<typename T>
 void bucket_merge_sort(vector<T> &list, bool descending) {
-    // Your code here!
-}
+    int size = list.size();
+    int b_size = 16;
 
+    for (int start = 0; start < size, start += b_size) {
+        int end = min(start+b_size, size);
+
+        for (int i = 1; i < size; i++) {
+            T current = list[i];
+
+            int j = i-1;
+            while(j >= 0 && (descending ? list[j] < current : list[j] > current)) {
+                list[j+1] = list[j];
+                j--;
+            }
+            list[j+1] = current;
+        }     
+    }
+
+    int step = bucket_size;
+    while (step < size) {
+        for (int first = 0; first + step < size; first += 2 * step) {
+            int middle = first + step;
+            int second = min(first + 2 * step, size);
+
+            int i = first;
+            int j = middle;
+
+            while (i < j && j < second) {
+                if (descending ? list[i] >= list[j] : list[i] <= list[j]) {
+                    j++;
+                } else {
+                    swap(list[i], list[j]);
+                    i++;
+                }
+            }
+        }
+        step *= 2;
+    }
+}
 
 
 
@@ -341,7 +383,11 @@ void binary_radix_sort(vector<T> &list, bool descending) {
  */
 template<typename T>
 void my_hybrid_sort(vector<T> &list, bool descending) {
-    // Your code here!
+    int size = list.size();
+    if (size < 2) return;
+
+    if (size < 32) insertion_sort(list, descending);
+    merge_sort(list, descending);
 }
 
 
