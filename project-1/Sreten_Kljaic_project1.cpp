@@ -373,7 +373,7 @@ void binary_radix_sort(vector<T> &list, bool descending) {
     }
 
     for (int i = 0; i < n_bits; i++) {
-        vector<Integral> zero, one;
+        vector<T> zero, one;
         T mask = 1 << i;
 
         for (int j = 0; j < size; j++) {
@@ -383,22 +383,22 @@ void binary_radix_sort(vector<T> &list, bool descending) {
                 one.push_back(list[j]);
             }
         }
-    }
 
-    list.clear();
-    if (descending) {
-        for (int i = 0; i < one.size(); i++) { 
-            list.push_back(one[i]);
-        }
-        for (int i = 0; i < zero.size(); i++) { 
-            list.push_back(zero[i]);
-        }
-    } else {
-        for (int i = 0; i < zero.size(); i++) { 
-            list.push_back(zero[i]);
-        }
-        for (int i = 0; i < one.size(); i++) { 
-            list.push_back(one[i]);
+        list.clear();
+        if (descending) {
+            for (int k = 0; k < one.size(); k++) { 
+                list.push_back(one[k]);
+            }
+            for (int k = 0; k < zero.size(); k++) { 
+                list.push_back(zero[k]);
+            }
+        } else {
+            for (int k = 0; k < zero.size(); k++) { 
+                list.push_back(zero[k]);
+            }
+            for (int k = 0; k < one.size(); k++) { 
+                list.push_back(one[k]);
+            }
         }
     }
 }
@@ -465,7 +465,6 @@ void my_hybrid_sort(vector<T> &list, bool descending) {
  */
 template<Integral T>
 void radix_sort(vector<T> &list, unsigned int base, bool descending) {
-    // Your code here!
     int size = list.size();
     if (size < 2) return;
 
@@ -478,33 +477,30 @@ void radix_sort(vector<T> &list, unsigned int base, bool descending) {
     }
 
     for (int i = 0; i < n_digits; i++) {
-        vector<Integral> buckets (base);
-        Integral mask = 1 << i;
+        vector<T> buckets (base);
+        T power = 1;
 
-        for (int j = 0; j < size; j++) {
-            if ((list[j] & mask) == 0) { 
-                zero.push_back(list[j]);
-            } else {
-                one.push_back(list[j]);
+        for (int j = 0; i < size; j++) {
+            int digit = (list[j] / power) % base;
+            buckets[digit].push_back(list[j]);
+        }
+
+        list.clear();
+        if (descending) {
+            for (int k = base - 1; k >= 0; k--) {
+                for (int v = 0; v < buckets[k].size(); v++) {
+                    list.push_back(buckets[k][v]);
+                }
+            }
+        } else {
+            for (int k = 0; k < base; k++) {
+                for (int v = 0; v < buckets[k].size(); v++) {
+                    list.push_back(buckets[k][v]);
+                }
             }
         }
-    }
 
-    list.clear();
-    if (descending) {
-        for (int i = 0; i < one.size(); i++) { 
-            list.push_back(one[i]);
-        }
-        for (int i = 0; i < zero.size(); i++) { 
-            list.push_back(zero[i]);
-        }
-    } else {
-        for (int i = 0; i < zero.size(); i++) { 
-            list.push_back(zero[i]);
-        }
-        for (int i = 0; i < one.size(); i++) { 
-            list.push_back(one[i]);
-        }
+        power *= base;
     }
 }
 
