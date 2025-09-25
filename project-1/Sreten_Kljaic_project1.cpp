@@ -361,7 +361,47 @@ void bucket_merge_sort(vector<T> &list, bool descending) {
  */
 template<Integral T> 
 void binary_radix_sort(vector<T> &list, bool descending) {
-    // Your code here!
+    int size = list.size();
+    if (size < 2) return;
+
+    Integral max = *max_element(list.begin(), list.end());
+
+    int n_bits = 0;
+    while (max > 0) {
+        max_val >>= 1;
+        n_bits++;
+    }
+
+    for (int i = 0; i < n_bits; i++) {
+        vector<Integral> zero, one;
+        Integral mask = 1 << i;
+
+        for (int j = 0; j < size; j++) {
+            if ((list[j] & mask) == 0) { 
+                zero.push_back(list[j]);
+            } else {
+                one.push_back(list[j]);
+            }
+        }
+    }
+
+    list.clear();
+    if (descending) {
+        for (int i = 0; i < one.size(); i++) { 
+            list.push_back(one[i]);
+        }
+        for (int i = 0; i < zero.size(); i++) { 
+            list.push_back(zero[i]);
+        }
+    } else {
+        for (int i = 0; i < zero.size(); i++) { 
+            list.push_back(zero[i]);
+        }
+        for (int i = 0; i < one.size(); i++) { 
+            list.push_back(one[i]);
+        }
+    }
+
 }
 
 
