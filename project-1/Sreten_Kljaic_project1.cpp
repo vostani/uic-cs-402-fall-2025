@@ -364,7 +364,7 @@ void binary_radix_sort(vector<T> &list, bool descending) {
     int size = list.size();
     if (size < 2) return;
 
-    Integral max = *max_element(list.begin(), list.end());
+    T max = *max_element(list.begin(), list.end());
 
     int n_bits = 0;
     while (max > 0) {
@@ -374,7 +374,7 @@ void binary_radix_sort(vector<T> &list, bool descending) {
 
     for (int i = 0; i < n_bits; i++) {
         vector<Integral> zero, one;
-        Integral mask = 1 << i;
+        T mask = 1 << i;
 
         for (int j = 0; j < size; j++) {
             if ((list[j] & mask) == 0) { 
@@ -401,7 +401,6 @@ void binary_radix_sort(vector<T> &list, bool descending) {
             list.push_back(one[i]);
         }
     }
-
 }
 
 
@@ -467,6 +466,46 @@ void my_hybrid_sort(vector<T> &list, bool descending) {
 template<Integral T>
 void radix_sort(vector<T> &list, unsigned int base, bool descending) {
     // Your code here!
+    int size = list.size();
+    if (size < 2) return;
+
+    T max = *max_element(list.begin(), list.end());
+
+    int n_digits = 0;
+    while (max > 0) {
+        max_val /= base;
+        n_digits++;
+    }
+
+    for (int i = 0; i < n_digits; i++) {
+        vector<Integral> buckets (base);
+        Integral mask = 1 << i;
+
+        for (int j = 0; j < size; j++) {
+            if ((list[j] & mask) == 0) { 
+                zero.push_back(list[j]);
+            } else {
+                one.push_back(list[j]);
+            }
+        }
+    }
+
+    list.clear();
+    if (descending) {
+        for (int i = 0; i < one.size(); i++) { 
+            list.push_back(one[i]);
+        }
+        for (int i = 0; i < zero.size(); i++) { 
+            list.push_back(zero[i]);
+        }
+    } else {
+        for (int i = 0; i < zero.size(); i++) { 
+            list.push_back(zero[i]);
+        }
+        for (int i = 0; i < one.size(); i++) { 
+            list.push_back(one[i]);
+        }
+    }
 }
 
 
