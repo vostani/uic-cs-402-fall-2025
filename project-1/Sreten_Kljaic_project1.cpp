@@ -58,16 +58,14 @@ using namespace std;
 template<typename T>
 void bubble_sort(vector<T> &list, bool descending) {
 
-    bool swap = true;
-    while (swap) {
+    bool swapping = true;
+    while (swapping) {
         swap = false;
         for (size_t i = 0; i < list.size()-1; i++) {
             if (descending ? list[i] < list[i+1] : list[i] > [i+1]) {
-                T temp = list[i];
-                list[i] = list[i+1];
-                list[i+1] = temp;
+                swap(list[i], list[i+1]);
 
-                swap = true;
+                swapping = true;
             }
         }
     }
@@ -114,9 +112,7 @@ void selection_sort(vector<T> &list, bool descending) {
         }
 
         if (index != i) {
-            T temp = list[i];
-            list[i] = list[i+1];
-            list[i+1] = temp;
+            swap(list[i], list[i+1]);
         }
 
     }
@@ -188,7 +184,7 @@ void insertion_sort(vector<T> &list, bool descending) {
  * */
 template<typename T>
 void quicksort(vector<T> &list, bool descending) {
-    // Your code here!
+    T pivot = list[]
 }
 
 
@@ -200,10 +196,13 @@ void quicksort(vector<T> &list, bool descending) {
  */
 template<typename T> 
 vector<T>& quick_partition(vector<T> &list, bool descending) {
-    // Your code here!
-    //
-    // You can use the helper function 
-    //      unsigned int get_rand_index(unsigned int len)
+    T pivot = list[list.size()-1]
+
+
+
+
+
+
 }
 
 
