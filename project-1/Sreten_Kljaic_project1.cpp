@@ -106,7 +106,7 @@ void selection_sort(vector<T> &list, bool descending) {
         size_t index = i;
 
         for (size_t j = i+1; i < list.size(); j++) {
-            if (desired ? list[j] > list[index] : list[j] < list[index]) {
+            if (descending ? list[j] > list[index] : list[j] < list[index]) {
                 index = j;
             }
         }
@@ -114,7 +114,6 @@ void selection_sort(vector<T> &list, bool descending) {
         if (index != i) {
             swap(list[i], list[i+1]);
         }
-
     }
 }
 
@@ -184,7 +183,10 @@ void insertion_sort(vector<T> &list, bool descending) {
  * */
 template<typename T>
 void quicksort(vector<T> &list, bool descending) {
-    T pivot = list[]
+    if (list.size() < 2) return;
+
+    unsigned int random = get_rand_index(list.size());
+    swap(list[list.size()-1], list[random]);
 }
 
 
@@ -196,13 +198,7 @@ void quicksort(vector<T> &list, bool descending) {
  */
 template<typename T> 
 vector<T>& quick_partition(vector<T> &list, bool descending) {
-    T pivot = list[list.size()-1]
-
-
-
-
-
-
+    return list;
 }
 
 
@@ -233,7 +229,40 @@ vector<T>& quick_partition(vector<T> &list, bool descending) {
  * */
 template<typename T>
 void merge_sort(vector<T> &list, bool decending) {
-    // Your code here!
+    size_t size = list.size();
+    if (size < 2) return;
+
+    size_t middle = size / 2;   
+    vector<T> left(list.begin(),list.begin() + middle);
+    vector<T> right(list.begin() + middle,list.end());
+    merge_sort(left);
+    merge_sort(right);
+
+    size_t i = 0; j = 0; k = 0;
+
+    while(i < left.size() && j < right.size()) {
+        if (decending ? left[i] > right[j] : left[i] < right[j]) {
+            list[k] = left[i];
+            i++;
+        } else {
+            list[k] = right[j];
+            j++;
+        }
+        k++;
+    }
+
+    while(i < size) {
+        list[k] = left[i];
+        i++;
+        k++;
+    }
+
+    while(j < size) {
+        list[k] = right[j];
+        j++;
+        k++;
+
+    }
 }
 
 
