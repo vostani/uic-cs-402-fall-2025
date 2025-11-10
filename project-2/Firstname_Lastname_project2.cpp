@@ -2,6 +2,7 @@
 #include <limits.h>
 #include <random>
 #include <iostream>
+#include <queue>
 
 // be sure to change FIRSTNAME and LASTNAME with your own first and last name
 #include "Firstname_Lastname_project2.h"
@@ -38,8 +39,7 @@ using namespace std;
 
 /*** GROUP PROJECT ***/
 // Please list ALL of your other group members as comments below.
-//   Member 1
-//   Member 2
+//   Leona Meharena
 
 
 
@@ -96,11 +96,25 @@ vector<unsigned int> birthday_attack_1(function<unsigned short(unsigned int)> ha
     //     vector<long> out = birthday_attack_1(test_hash);
     // Note you can implement your own test hash functions so long as their 
     // signatures match the `test_hash` function signature.
-    
     // Your code here!
+    for (size_t i = 0; i < 3; ++i ) {
+        unordered_map<unsigned short, unsigned int> numbers;
+
+        for (size_t j = 0; j < 350; ++j) {
+            unsigned int num = sample_int();
+            unsigned short hash = hash_function(num);
+
+            if (numbers.find(hash) != numbers.end()) {
+                return {numbers[hash], num};
+            }
+
+            numbers[hash] = num;
+        }
+
+    }
+
+    return {};
 }
-
-
 
 /* Birthday Attack 2
  *
@@ -153,6 +167,20 @@ vector<unsigned int> birthday_attack_2(function<unsigned short(unsigned int)> ha
     // signatures match the `test_hash` function signature.
     
     // Your code here!
+    unsigned int tort = hash_function(0);
+    unsigned int hare = hash_function(tort);
+
+    while(tort != hare) {
+        tort = hash_function(tort);
+        hare = hash_function(hash_function(hare));
+    }
+    tort = 0;
+    while (hash_function(tort) != hash_function(hare)){
+        tort = hash_function(tort);
+        hare = hash_function(hare);
+    }
+
+    return {tort, hare};
 }
 
 
@@ -179,10 +207,37 @@ vector<unsigned int> birthday_attack_2(function<unsigned short(unsigned int)> ha
  * Note: Edge is a struct defined in Firstname_Lastname_project2.h.
  *
  */
-
-
 vector<int> topological_sort(int n, vector<Edge> edges) {
     // Your code here!
+    vector<vector<int>> adjacent(n);
+    vector<int> preds(n, 0);
+
+    for (const auto& e : edges) {
+        adjacent[e.from].push_back(e.to);
+        preds[e.to]++;
+    }
+
+    queue<int> q;
+    for (int i = 0; i < n; i++) {
+        if (preds[i] == 0)
+            q.push(i);
+    }
+
+    vector<int> sorting;
+    while (!q.empty()) {
+        int curr = q.front(); q.pop();
+        sorting.push_back(curr);
+
+        for (const auto& adj : adjacent[curr]) {
+            preds[adj]--;
+            if (preds[adj] == 0)
+                q.push(adj);
+        }
+    }
+
+    if (sorting.size() == n) return sorting;
+
+    return {};
 }
 
 
@@ -214,6 +269,22 @@ vector<int> topological_sort(int n, vector<Edge> edges) {
  *
  */
 vector<int> dag_single_source(int n, vector<Edge> edges, int source) {
+    vector<int> cost (n, INT_MAX);
+    cost[source] = 0;
+
+    vector<vector<vector<int>>> adjacent;
+    for (const auto& e : edges) {
+        adjacent[e.from].push_back({e.to, e.weight});
+    }
+    vector<int> topo = topological_sort(n, edges);
+    for (const auto& curr : topo) {
+        for (const auto& adj : adjacent[curr]) {
+            if (cost[adj[0]] > cost[curr] + adj[1])
+                cost[adj[0]] = cost[curr] + adj[1];
+        }
+    }
+
+    return cost;
 }
 
 
@@ -249,6 +320,44 @@ vector<Node> dijkstras_algorithm(int n, vector<Edge> edges, int source) {
     // Your code here!
     // Note: see the LeetCode from in-class for the problem "Cheapest Flights
     // K stops" to see how you can create a priority_queue with the Node struct.
+    vector<Node> nodes;
+    for (int i = 0; i < n; i++) {
+        if (i == source) {
+            nodes.push_back({i, 0, -1});
+            continue;
+        }
+        nodes.push_back({i, INT_MAX, -1});
+    }
+
+    vector<vector<vector<int>>> adjacent;
+    for (const auto& e : edges) {
+        adjacent[e.from].push_back({e.to, e.weight});
+    }
+
+    priority_queue<Node, vector<Node>, greater<Node>> mq;
+    mq.push(nodes[source]);
+    
+    while (!mq.empty()) {
+        Node curr = mq.top(); mq.pop();
+
+        // already have a better path
+        if (curr.path_cost > nodes[curr.id].path_cost)
+            continue;
+
+        for (auto& adj : adjacent[curr.id]) {
+            int id = adj[0];
+            int weight = adj[1];
+            int cost = curr.path_cost + weight;
+
+            if (cost < nodes[id].path_cost) {
+                nodes[id].path_cost = cost;
+                nodes[id].pred = curr.id;
+                mq.push(nodes[id]);
+           }
+            
+        }
+    }
+    return nodes;
 }
 
 
@@ -348,6 +457,7 @@ vector<Node> dijkstras_algorithm(int n, vector<Edge> edges, int source) {
 // You must implement this function.
 double heuristic_cost(GridNode start, GridNode dest) {
     // Your code here!
+    return min(abs(start.x - dest.x), abs(start.y - dest.y));
 }
 
 // To test your algorithm with the function "heruistic_cost" above,
@@ -364,8 +474,66 @@ vector<GridNode> a_star_algorithm(
     // Your code here!
     // Be sure to use "h" from the inputs in your implementation; do not
     // directly use "heruistic_cost" above!
+    vector<GridNode> nodes;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (i == source.x && j == source.y) {
+                nodes.push_back(source);
+                continue;
+            }
+            if (i == target.x && j == target.y) {
+                nodes.push_back(target);
+                continue;
+            }
+
+            nodes.push_back({i, j, INT_MAX, -1, -1});
+        }
+    }
+
+    vector<vector<pair<GridNode, int>>> adjacent(n*m);
+    for (const auto& e : edges) {
+        double weight = 1;
+        if (abs(e.from_x - e.to_x) == 1 && abs(e.from_y - e.to_y) == 1) 
+            weight = 1.5;
+        adjacent[e.from_y*m + e.from_x].push_back({nodes[e.to_y*n + e.to_x], weight});
+    }
+
+    priority_queue<GridNode, vector<GridNode>, greater<GridNode>> mq;
+    mq.push(source);
+    
+    while (!mq.empty()) {
+        GridNode curr = mq.top(); mq.pop();
+        int id = curr.y*m + curr.x;
+
+        // already have a better path
+        if (curr.path_cost > nodes[id].path_cost)
+            continue;
+
+        for (auto& adj : adjacent[id]) {
+            GridNode next = adj.first;
+            int weight = adj.second;
+            int cost = curr.path_cost + weight + h(next, target);
+
+            int nid = next.y*m + next.x;
+            if (cost < nodes[nid].path_cost) {
+                nodes[nid].path_cost = cost;
+                nodes[nid].pred_x = curr.x;
+                nodes[nid].pred_y = curr.y;
+                mq.push(nodes[nid]);
+           }
+        }
+    }
+
+    vector<GridNode> path;
+    GridNode iter = target;
+    while (iter.pred_x != 1 || iter.pred_y !=1) {
+        path.push_back(iter);
+        iter = nodes[iter.pred_y*m + iter.pred_x];
+    }
+    return path;
 }
 
 int main() {
+
     return 0;
 }
