@@ -317,15 +317,13 @@ vector<int> dag_single_source(int n, vector<Edge> edges, int source) {
  * 
  * Note: Node is a struct defined in Firstname_Lastname_project2.h.
  */
-
-
 vector<Node> dijkstras_algorithm(int n, vector<Edge> edges, int source) {
     // Your code here!
     // Note: see the LeetCode from in-class for the problem "Cheapest Flights
     // K stops" to see how you can create a priority_queue with the Node struct.
     vector<Node> nodes;
     for (int i = 0; i < n; i++) {
-        nodes.push_back({i, 0, -1});
+        nodes.push_back({i, INT_MAX, -1});
     }
     nodes[source].path_cost = 0;
 
@@ -523,5 +521,101 @@ vector<GridNode> a_star_algorithm(
 }
 
 int main() {
+    cout << "***** TEST BDAY 1" << endl;
+    vector<unsigned int> bday1 = birthday_attack_1(test_hash);
+    cout << bday1[0] << " and " << bday1[1] << endl;
+
+    cout << "***** TEST BDAY 2" << endl;
+    vector<unsigned int> bday2 = birthday_attack_1(test_hash);
+    cout << bday2[0] << " and " << bday2[1] << endl;
+    
+    int size = 5;
+
+    vector<Edge> unweighted = {
+        {0, 1, 1},
+        {0, 2, 1},
+        {1, 3, 1},
+        {2, 1, 1},
+        {2, 3, 1},
+        {3, 4, 1}
+    };
+
+    vector<Edge> unweighted_circle = {
+        {0, 1, 1},
+        {0, 2, 1},
+        {1, 3, 1},
+        {1, 2, 1},
+        {2, 1, 1}, // circle 2 to 1 to 2
+        {2, 3, 1},
+        {3, 4, 1}
+    };
+
+    vector<Edge> weighted = {
+        {0, 1, 1},
+        {0, 2, 10},
+        {1, 3, 3},
+        {2, 1, -20},
+        {2, 3, 1},
+        {3, 4, 2}
+    };
+
+    cout << "********************" << endl;
+    cout << "***** TEST TOPO SORT" << endl;
+    cout << "********************" << endl;
+    vector<int> topo = topological_sort(size, unweighted);
+    cout << "\nNO CIRCLES: " << endl;
+    cout << "path: ";
+    for (const auto& x : topo) {
+        cout << " " << x;
+    }
+    cout << endl;
+
+    cout << "\nCIRCLES: " << endl;
+    vector<int> topo_circle = topological_sort(size, unweighted_circle);   
+    if (topo_circle.empty()) cout << "SUCCESS : CIRCLE DETECTED" << endl;
+    else {
+        cout << "Wrong path: ";
+        for (const auto& x : topo_circle) {
+            cout << " " << x;
+        }
+        cout << endl;
+    }
+
+
+    cout << "********************" << endl;
+    cout << "***** TEST DAG SI SO" << endl;
+    cout << "********************" << endl;
+    vector<int> dag = dag_single_source(size, unweighted, 0);
+    cout << "unweighted path: ";
+    for (const auto& x : dag) {
+        cout << " " << x;
+    }
+    cout << endl;
+
+    vector<int> dag_weighted = dag_single_source(size, weighted, 0);
+    cout << "weighted path: ";
+    for (const auto& x : dag_weighted) {
+        cout << " " << x;
+    }
+    cout << endl;
+    cout << "********************" << endl;
+    cout << "***** TEST DIJKSTRA" << endl;
+    cout << "********************" << endl;
+    cout << "\nNO CIRCLES: " << endl;
+    vector<Node> dij =  dijkstras_algorithm(size, unweighted, 0);
+    cout << "path: ";
+    for (const auto& x : dij) {
+        cout << " {" << x.id << ", " << x.path_cost << "}";
+    }
+    cout << endl;
+
+    cout << "\nCIRCLES: " << endl;
+    vector<Node> dij_circle =  dijkstras_algorithm(size, unweighted_circle, 0);
+    cout << "path: ";
+    for (const auto& x : dij_circle) {
+        cout << " {" << x.id << ", " << x.path_cost << "}";
+    }
+    cout << endl;
+
     return 0;
 }
