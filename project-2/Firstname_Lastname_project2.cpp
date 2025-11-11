@@ -3,6 +3,7 @@
 #include <random>
 #include <iostream>
 #include <queue>
+#include <unordered_map>
 
 // be sure to change FIRSTNAME and LASTNAME with your own first and last name
 #include "Firstname_Lastname_project2.h"
@@ -97,7 +98,7 @@ vector<unsigned int> birthday_attack_1(function<unsigned short(unsigned int)> ha
     // Note you can implement your own test hash functions so long as their 
     // signatures match the `test_hash` function signature.
     // Your code here!
-    for (size_t i = 0; i < 3; ++i ) {
+    for (size_t i = 0; i < 3; i++) {
         unordered_map<unsigned short, unsigned int> numbers;
 
         for (size_t j = 0; j < 350; ++j) {
@@ -272,15 +273,16 @@ vector<int> dag_single_source(int n, vector<Edge> edges, int source) {
     vector<int> cost (n, INT_MAX);
     cost[source] = 0;
 
-    vector<vector<vector<int>>> adjacent;
+    vector<vector<pair<int, int>>> adjacent (n);
     for (const auto& e : edges) {
         adjacent[e.from].push_back({e.to, e.weight});
     }
     vector<int> topo = topological_sort(n, edges);
     for (const auto& curr : topo) {
-        for (const auto& adj : adjacent[curr]) {
-            if (cost[adj[0]] > cost[curr] + adj[1])
-                cost[adj[0]] = cost[curr] + adj[1];
+        if (cost[curr] == INT_MAX) continue;
+        for (const auto& [nid, weight] : adjacent[curr]) {
+            if (cost[nid] > cost[curr] + weight)
+                cost[nid] = cost[curr] + weight;
         }
     }
 
@@ -320,16 +322,9 @@ vector<Node> dijkstras_algorithm(int n, vector<Edge> edges, int source) {
     // Your code here!
     // Note: see the LeetCode from in-class for the problem "Cheapest Flights
     // K stops" to see how you can create a priority_queue with the Node struct.
-    vector<Node> nodes;
-    for (int i = 0; i < n; i++) {
-        if (i == source) {
-            nodes.push_back({i, 0, -1});
-            continue;
-        }
-        nodes.push_back({i, INT_MAX, -1});
-    }
+    vector<Node> nodes (n, {i, INT_MAX, -1});
 
-    vector<vector<vector<int>>> adjacent;
+    vector<vector<pair<int, int>>> adjacent (n);
     for (const auto& e : edges) {
         adjacent[e.from].push_back({e.to, e.weight});
     }
@@ -344,15 +339,13 @@ vector<Node> dijkstras_algorithm(int n, vector<Edge> edges, int source) {
         if (curr.path_cost > nodes[curr.id].path_cost)
             continue;
 
-        for (auto& adj : adjacent[curr.id]) {
-            int id = adj[0];
-            int weight = adj[1];
+        for (const auto& [nid, weight] : adjacent[curr.id]) {
             int cost = curr.path_cost + weight;
 
-            if (cost < nodes[id].path_cost) {
-                nodes[id].path_cost = cost;
-                nodes[id].pred = curr.id;
-                mq.push(nodes[id]);
+            if (cost < nodes[nid].path_cost) {
+                nodes[nid].path_cost = cost;
+                nodes[nid].pred = curr.id;
+                mq.push(nodes[nid]);
            }
             
         }
