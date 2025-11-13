@@ -509,13 +509,17 @@ vector<GridNode> a_star_algorithm(
         }
     }
 
+    GridNode iter = nodes[target.y * m + target.x];
+
+    if (iter.path_cost == INT_MAX)
+        return {};
+
     vector<GridNode> path;
-    GridNode iter = target;
-    while (iter.pred_x != 1 || iter.pred_y !=1) {
+    while (true) {
         path.push_back(iter);
+        if (iter.pred_x == source.pred_x && iter.pred_y == source.pred_y)
         iter = nodes[iter.pred_y*m + iter.pred_x];
     }
-    path.push_back(iter);
     reverse(path.begin(), path.end());
     return path;
 }
