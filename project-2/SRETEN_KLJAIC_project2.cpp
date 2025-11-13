@@ -475,8 +475,16 @@ vector<GridNode> a_star_algorithm(
             nodes.push_back({i, j, INT_MAX, -1, -1});
         }
     }
-    nodes[source.y*m + source.x] = source;
-    nodes[target.y*m + target.x] = target;
+    int sid = source.y*m + source.x;
+    int tid = target.y*m + target.x; 
+    nodes[sid] = source;
+    nodes[sid].path_cost = 0;
+    nodes[sid].pred_x = -1;
+    nodes[sid].pred_y = -1;
+    nodes[tid] = target;
+    nodes[tid].path_cost = 0;
+    nodes[tid].pred_x = -1;
+    nodes[tid].pred_y = -1;
 
     vector<vector<pair<int, double>>> adjacent(m*n);
     for (const auto& e : edges) {
@@ -509,7 +517,7 @@ vector<GridNode> a_star_algorithm(
         }
     }
 
-    GridNode iter = nodes[target.y * m + target.x];
+    GridNode iter = nodes[tid];
 
     if (iter.path_cost == INT_MAX)
         return {};
@@ -525,101 +533,50 @@ vector<GridNode> a_star_algorithm(
 }
 
 int main() {
-    cout << "***** TEST BDAY 1" << endl;
-    vector<unsigned int> bday1 = birthday_attack_1(test_hash);
-    cout << bday1[0] << " and " << bday1[1] << endl;
+    cout << "******* TEST A* **********" << endl;
 
-    cout << "***** TEST BDAY 2" << endl;
-    vector<unsigned int> bday2 = birthday_attack_1(test_hash);
-    cout << bday2[0] << " and " << bday2[1] << endl;
-    
-    int size = 5;
+    int m = 5;
+    int n = 3;
 
-    vector<Edge> unweighted = {
-        {0, 1, 1},
-        {0, 2, 1},
-        {1, 3, 1},
-        {2, 1, 1},
-        {2, 3, 1},
-        {3, 4, 1}
+    GridNode source = {0, 0, 0. -1, -1};
+    GridNode target = {4, 2, INT_MAX, -1, -1};
+
+    vector<GridEdge> edges = {
+        // (0,0) -> (0,1)
+        {0,0, 0,1}, {0,1, 0,0},
+        
+        // (0,1) -> (1,1)
+        {0,1, 1,1}, {1,1, 0,1},
+        
+        // (1,1) -> (2,1)
+        {1,1, 2,1}, {2,1, 1,1},
+        
+        // (2,1) -> (2,0)   vertical up
+        {2,1, 2,0}, {2,0, 2,1},
+        
+        // (2,0) -> (3,1)   diagonal down-right
+        {2,0, 3,1}, {3,1, 2,0},
+        
+        // (3,1) -> (4,2)   diagonal down-right
+        {3,1, 4,2}, {4,2, 3,1}
     };
 
-    vector<Edge> unweighted_circle = {
-        {0, 1, 1},
-        {0, 2, 1},
-        {1, 3, 1},
-        {1, 2, 1},
-        {2, 1, 1}, // circle 2 to 1 to 2
-        {2, 3, 1},
-        {3, 4, 1}
-    };
+    auto path = a_star_algorithm(m, n, edges, source, target, heuristic_cost);
 
-    vector<Edge> weighted = {
-        {0, 1, 1},
-        {0, 2, 10},
-        {1, 3, 3},
-        {2, 1, -20},
-        {2, 3, 1},
-        {3, 4, 2}
-    };
-
-    cout << "********************" << endl;
-    cout << "***** TEST TOPO SORT" << endl;
-    cout << "********************" << endl;
-    vector<int> topo = topological_sort(size, unweighted);
-    cout << "\nNO CIRCLES: " << endl;
-    cout << "path: ";
-    for (const auto& x : topo) {
-        cout << " " << x;
-    }
-    cout << endl;
-
-    cout << "\nCIRCLES: " << endl;
-    vector<int> topo_circle = topological_sort(size, unweighted_circle);   
-    if (topo_circle.empty()) cout << "SUCCESS : CIRCLE DETECTED" << endl;
-    else {
-        cout << "Wrong path: ";
-        for (const auto& x : topo_circle) {
-            cout << " " << x;
+    // Print result
+    if (path.empty()) {
+        cout << "No path found (BUG!)" << endl;
+    } else {
+        cout << "Path found! Length: " << path.size() << endl;
+        cout << "Path:" << endl;
+        for (const auto& node : path) {
+            cout << "(" << node.x << "," << node.y << ") ";
         }
         cout << endl;
-    }
 
-
-    cout << "********************" << endl;
-    cout << "***** TEST DAG SI SO" << endl;
-    cout << "********************" << endl;
-    vector<int> dag = dag_single_source(size, unweighted, 0);
-    cout << "unweighted path: ";
-    for (const auto& x : dag) {
-        cout << " " << x;
+        // Expected path:
+        cout << "Expected: (0,0) (0,1) (1,1) (2,1) (2,0) (3,1) (4,2)" << endl;
     }
-    cout << endl;
-
-    vector<int> dag_weighted = dag_single_source(size, weighted, 0);
-    cout << "weighted path: ";
-    for (const auto& x : dag_weighted) {
-        cout << " " << x;
-    }
-    cout << endl;
-    cout << "********************" << endl;
-    cout << "***** TEST DIJKSTRA" << endl;
-    cout << "********************" << endl;
-    cout << "\nNO CIRCLES: " << endl;
-    vector<Node> dij =  dijkstras_algorithm(size, unweighted, 0);
-    cout << "path: ";
-    for (const auto& x : dij) {
-        cout << " {" << x.id << ", " << x.path_cost << "}";
-    }
-    cout << endl;
-
-    cout << "\nCIRCLES: " << endl;
-    vector<Node> dij_circle =  dijkstras_algorithm(size, unweighted_circle, 0);
-    cout << "path: ";
-    for (const auto& x : dij_circle) {
-        cout << " {" << x.id << ", " << x.path_cost << "}";
-    }
-    cout << endl;
 
     return 0;
 }
